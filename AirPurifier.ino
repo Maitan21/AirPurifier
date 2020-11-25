@@ -31,6 +31,12 @@ float Vo_value = 0;
 float Voltage = 0;
 float dustDensity = 0;
 
+int red_light_pin = 11;
+int green_light_pin = 10;
+int blue_light_pin = 9;
+
+
+
 /* ***************************************************************************** */
 /* ************************** Header - Dust Sensor  **************************** */
 /* ***************************************************************************** */
@@ -53,6 +59,13 @@ void setup() {
   Serial.println("***** Welcome to ROBOFRIEN world *****");
   Serial.println("***** Thank you **********************");
   Serial.println("**************************************");
+/* ***************************************************************************** */
+/* ************************** Setup - RGB LED  ************************************* */
+/* ***************************************************************************** */
+ 
+  pinMode(red_light_pin,OUTPUT);
+  pinMode(green_light_pin,OUTPUT);
+  pinMode(blue_light_pin, OUTPUT);
 
 /* ***************************************************************************** */
 /* ************************** Setup - LCD  ************************************* */
@@ -122,64 +135,88 @@ void setup() {
 /* ***************************************************************************** */
   pinMode(FAN, OUTPUT);
   digitalWrite(FAN, LOW);
-
-  
+/* ***************************************************************************** */
+/* ************************** Setup - MotionDetect ***************************** */
+/* ***************************************************************************** */
+  pinMode(7,INPUT)
 }
 
 
 void loop() {
-/* ***************************************************************************** */
-/* ************************** Loop - Dust Sensor   ***************************** */
-/* ***************************************************************************** */
-  digitalWrite(V_LED, LOW);
-  delayMicroseconds(280);
-  Vo_value = analogRead(Vo);
-  delayMicroseconds(40);
-  digitalWrite(V_LED, HIGH);
-  delayMicroseconds(9680);
 
-  Voltage = Vo_value / 1024 * 5.0;
-  dustDensity = (Voltage - 0.3) / 0.005;
-  Serial.println(dustDensity);
+  if(digitalRead(7) == HIGH){
 
-  
-  delay(1000);
+  /* ***************************************************************************** */
+  /* ************************** Loop - Dust Sensor   ***************************** */
+  /* ***************************************************************************** */
+    digitalWrite(V_LED, LOW);
+    delayMicroseconds(280);
+    Vo_value = analogRead(Vo);
+    delayMicroseconds(40);
+    digitalWrite(V_LED, HIGH);
+    delayMicroseconds(9680);
+
+    Voltage = Vo_value / 1024 * 5.0;
+    dustDensity = (Voltage - 0.3) / 0.005;
+    Serial.println(dustDensity);
+
+    
+    delay(1000);
 
 
 
-/* ***************************************************************************** */
-/* ************************** Loop - LCD   ************************************* */
-/* ***************************************************************************** */
-    display.clearDisplay();     //lcd 화면을 지웁니다.
-    display.setCursor(10,10);     //lcd 커서 위치를 10,10로 위치시킵니다.
-    display.println(F("KNU Air Cleaner"));
-    display.setCursor(10,30);     //lcd 커서 위치를 10,30로 위치시킵니다.
-    if( dustDensity > 150 ){    // 매우 나쁨 //
-      display.println("AIR : VERY BAD!!");
-    }else if( dustDensity > 80){   // 나쁨 //
-      display.println("AIR : BAD!      ");   
-    }else if( dustDensity > 30){  // 보통 //
-      display.println("AIR : NORMAL     ");   
-    }else{                    // 좋음
-      display.println("AIR : GOOD      ");   
+  /* ***************************************************************************** */
+  /* ************************** Loop - LCD   ************************************* */
+  /* ***************************************************************************** */
+      display.clearDisplay();     //lcd 화면을 지웁니다.
+      display.setCursor(10,10);     //lcd 커서 위치를 10,10로 위치시킵니다.
+      display.println(F("KNU Air Cleaner"));
+      display.setCursor(10,30);     //lcd 커서 위치를 10,30로 위치시킵니다.
+      if( dustDensity > 150 ){    // 매우 나쁨 //
+        display.println("AIR : VERY BAD!!");
+      }else if( dustDensity > 80){   // 나쁨 //
+        display.println("AIR : BAD!      ");   
+      }else if( dustDensity > 30){  // 보통 //
+        display.println("AIR : NORMAL     ");   
+      }else{                    // 좋음
+        display.println("AIR : GOOD      ");   
+      }
+      display.setCursor(10,40);     //lcd 커서 위치를 10,40로 위치시킵니다.
+      display.print("ug/m3:");
+      display.println(dustDensity);
+      display.drawBitmap( 104, 46, cat_foot, 24, 18, 1);
+
+      display.display();
+
+
+  /* ***************************************************************************** */
+  /* ************************** Loop - FAN   ************************************* */
+  /* ***************************************************************************** */
+    if(dustDensity > 80){
+      digitalWrite(FAN, HIGH);
+    }else{
+      digitalWrite(FAN, LOW);    
     }
-    display.setCursor(10,40);     //lcd 커서 위치를 10,40로 위치시킵니다.
-    display.print("ug/m3:");
-    display.println(dustDensity);
-    display.drawBitmap( 104, 46, cat_foot, 24, 18, 1);
 
-    display.display();
+    delay(1000);
 
-
-/* ***************************************************************************** */
-/* ************************** Loop - FAN   ************************************* */
-/* ***************************************************************************** */
-  if(dustDensity > 80){
-    digitalWrite(FAN, HIGH);
-  }else{
-    digitalWrite(FAN, LOW);    
+  /* ***************************************************************************** */
+  /* ************************** Loop - FAN   ************************************* */
+  /* ***************************************************************************** */
+    RGB_color(255,0,0); //RED 표시
+    delay(5000); //1초대기
+    RGB_color(0,255,0); //Green 초록 표시
+    delay(5000);
+    RGB_color(0,0,255); //Blue 파랑 표시
+    delay(5000);
   }
+}
 
-  delay(1000);
-  
+
+/* RGB Fuction */
+void RGB_color(int red_light_value, int green_light_value, int blue_light_value)
+{
+  analogWrite(red_light_pin,red_light_value);
+  analogWrite(green_light_pin, green_light_value);
+  analogWrite(blue_light_pin,blue_light_value);
 }
