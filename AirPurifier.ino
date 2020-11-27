@@ -144,8 +144,17 @@ void setup() {
 
 void loop() {
 
-  if(digitalRead(7) == HIGH){
+  RGB_color(138, 43, 226);
+  display.clearDisplay();     //lcd 화면을 지웁니다.
+  display.setCursor(10,10);     //lcd 커서 위치를 10,10로 위치시킵니다.
+  display.println(F("KNU Air Cleaner"));
+  display.setCursor(10,30);
+  display.println("Detecting...");
 
+
+  //감지됨
+  if(digitalRead(7) == HIGH){
+    
   /* ***************************************************************************** */
   /* ************************** Loop - Dust Sensor   ***************************** */
   /* ***************************************************************************** */
@@ -160,10 +169,7 @@ void loop() {
     dustDensity = (Voltage - 0.3) / 0.005;
     Serial.println(dustDensity);
 
-    
     delay(1000);
-
-
 
   /* ***************************************************************************** */
   /* ************************** Loop - LCD   ************************************* */
@@ -174,12 +180,16 @@ void loop() {
       display.setCursor(10,30);     //lcd 커서 위치를 10,30로 위치시킵니다.
       if( dustDensity > 150 ){    // 매우 나쁨 //
         display.println("AIR : VERY BAD!!");
+        RGB_color(255,0,0); // RED
       }else if( dustDensity > 80){   // 나쁨 //
         display.println("AIR : BAD!      ");   
+        RGB_color(255,165,0); // Orange
       }else if( dustDensity > 30){  // 보통 //
-        display.println("AIR : NORMAL     ");   
+        display.println("AIR : NORMAL     ");
+        RGB_color(0,0,255);  //Blue   
       }else{                    // 좋음
-        display.println("AIR : GOOD      ");   
+        display.println("AIR : GOOD      ");
+        RGB_color(0,255,0); //Green 초록 표시   
       }
       display.setCursor(10,40);     //lcd 커서 위치를 10,40로 위치시킵니다.
       display.print("ug/m3:");
@@ -194,8 +204,9 @@ void loop() {
   /* ***************************************************************************** */
     if(dustDensity > 80){
       digitalWrite(FAN, HIGH);
+      
     }else{
-      digitalWrite(FAN, LOW);    
+      digitalWrite(FAN, LOW);  
     }
 
     delay(1000);
@@ -203,12 +214,7 @@ void loop() {
   /* ***************************************************************************** */
   /* ************************** Loop - RGB ************************************* */
   /* ***************************************************************************** */
-    RGB_color(255,0,0); //RED 표시
-    delay(5000); //1초대기
-    RGB_color(0,255,0); //Green 초록 표시
-    delay(5000);
-    RGB_color(0,0,255); //Blue 파랑 표시
-    delay(5000);
+    
   }
 }
 
