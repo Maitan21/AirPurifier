@@ -9,3 +9,6 @@ AirPurifier with arduino
 ## ETC
 - Sample Video : `simulation.mp4`
 
+## Contributor
+- KNU
+
